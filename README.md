@@ -144,9 +144,24 @@ Modify the `threshold` constant in each file to adjust the threshold for advanci
 
 Units188
 
+
 ## License
 
-[To be defined]
+This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License**.
+
+You are free to:
+- ✅ Share and use for personal/educational purposes
+- ✅ Modify and adapt the code
+- ✅ Distribute your modifications
+
+Under these conditions:
+- 📝 Give appropriate credit
+- 🚫 No commercial use
+- 🔄 Share modifications under the same license
+
+See the [LICENSE](LICENSE) file for full details.
+
+**For commercial licensing inquiries, please open an issue.**
 
 ## Citation
 
