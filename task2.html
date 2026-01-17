@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jatos.js"></script>
+    <title>Niveau 2</title>
+    <meta charset="UTF-8">
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+
+        #task-container {
+            width: 22cm;  
+            height: 22cm;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            position: relative;
+            margin-bottom: 20px;
+            overflow: hidden;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stimulus {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            color: black;
+            line-height: 0;
+            width: 80px;
+            height: 80px;
+        }
+
+        .stimulus svg {
+            width: 100%;
+            height: 100%;
+            stroke: black;
+            stroke-width: 2;
+        }
+
+        .target {
+            position: absolute;
+            display: block;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+        }
+
+        .target svg {
+            width: 100%;
+            height: 100%;
+            stroke: black;
+            stroke-width: 2;
+        }
+
+        .distractor {
+            position: absolute;
+            display: block;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+        }
+
+        .distractor svg {
+            width: 100%;
+            height: 100%;
+            stroke: black;
+            stroke-width: 2;
+        }
+
+        .response-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .options {
+            position: fixed;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);
+            display: none;
+            gap: 10px;
+            flex-direction: column;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            width: auto;
+            min-width: 180px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            min-width: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 5px;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #f0f0f0;
+            border-color: #ccc;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button svg {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+        }
+
+        #start-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #start-button:hover {
+            background-color: #45a049;
+        }
+
+        #start-button:disabled {
+            background-color: #cccccc;
+        }
+
+        .feedback {
+            position: fixed;
+            bottom: 50%; /* 20px */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            border-radius: 6px;
+            display: none;
+            z-index: 2000;
+            min-width: 200px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-weight: 500;
+        }
+
+        .instruction {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background-color: #e9ecef;
+            border-radius: 6px;
+            display: none;
+            z-index: 2000;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-weight: 500;
+        }
+
+        .correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .config {
+            position: fixed;
+            top: 20px ;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            font-weight: 600;
+            font-size: 18px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .status {
+            position: fixed;
+            left: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background-color: white;
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            width: 220px;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .status-item {
+            padding: 8px 16px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        #stats {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .button-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .visual-markers {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+        }
+
+        .marker::before,
+        .marker::after {
+            content: '';
+            position: absolute;
+            background-color: black;
+            opacity: 0.3;
+        }
+
+        .marker::before {
+            width: 2px;
+            height: 20px;
+            left: 9px;
+            top: 0;
+        }
+
+        .marker::after {
+            width: 20px;
+            height: 2px;
+            left: 0;
+            top: 9px;
+        }
+
+        .modal {
+        display: block;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+            }
+
+        .modal-content {
+            background-color: #f5f5f5;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        .modal-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .modal-text {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #444;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+
+        .level-text {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .close-btn {
+            display: block;
+            margin: 30px auto 0;
+            padding: 12px 40px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background-color: #45a049;
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #666;
+        }
+        /* Fin de niveau */
+        .stats-summary {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .stats-item {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .level-chart-container {
+            margin: 30px 0;
+        }
+
+        .level-chart {
+            height: 200px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+            border: 1px solid #dee2e6;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+        }
+
+        .chart-bar {
+            background-color: #4CAF50;
+            width: 8px;
+            margin: 0 1px;
+            border-radius: 4px 4px 0 0;
+            position: relative;
+        }
+
+        .chart-bar.threshold {
+            background-color: #dc3545;
+            position: absolute;
+            height: 2px;
+            width: 100%;
+            left: 0;
+            bottom: 40px;
+        }
+
+        .chart-axis {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 1px;
+            background-color: #adb5bd;
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: 5px;
+            font-size: 10px;
+            transform: rotate(-45deg);
+            transform-origin: top left;
+            color: #6c757d;
+        }
+
+        .end-level-message {
+            font-size: 18px;
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .message-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message-failure {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        :root {
+        --stim-size: 80px; /* Taille par défaut, sera remplacée par JS */
+        }  
+    </style>
+</head>
+<body>
+    <div id="instructionsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-text">
+                <h1>Premier cap franchi : niveau 2 débloqué ! 🚀</h1>
+            
+                <h2>Déroulement</h2>
+            
+                <ol>
+                    <li>Placez votre regard sur la croix centrale.</li>
+                    <li>Appuyez sur <strong>"Commencer"</strong> ou sur la <strong>barre d'espace</strong> pour démarrer.</li>
+                    <li>Désormais, deux objets s'afficheront brièvement : <ul>L'un au centre de l'écran, l'autre en périphérie.</ul></li>
+                    <li>Sélectionnez l'objet que vous avez vu au <strong>centre</strong> de l'ecran parmi les options proposées.</li>
+                    <li>Sélectionnez l'objet que vous avez vu en <strong>périphérie</strong> parmi les options proposées.</li>
+                </ol>
+            
+                <p>Le <strong>temps d'affichage</strong> s'ajustera automatiquement en fonction de vos performances.</p>
+            
+            </div>
+            <button class="close-btn" onclick="closeModal()">Fermer</button>
+        </div>
+    </div>
+    <div id="timer-overlay" style="
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 10px 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        z-index: 9999;
+        font-weight: 600;
+        font-size: 18px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    ">
+        Temps : <span id="time-remaining">5:00</span>
+    </div>
+    <div class="config">
+        <div class="presentation-time">
+            Temps de présentation actuel : <span id="current-duration">1000</span> ms
+        </div>
+    </div>
+
+    <div id="task-container">
+        <div class="visual-markers">
+            <div class="marker" style="left: calc(50% - 10px); top: calc(50% - 10px);"></div>
+            <div class="marker" style="left: 25%; top: 25%;"></div>
+            <div class="marker" style="right: 25%; top: 25%;"></div>
+            <div class="marker" style="left: 25%; bottom: 25%;"></div>
+            <div class="marker" style="right: 25%; bottom: 25%;"></div>
+        </div>
+        <div id="stimulus" class="stimulus"></div>
+        <div id="target" class="target"></div>
+
+        <div id="visual-options" class="options">
+            <button onclick="handleVisualResponse('pedestrian')">
+                <div class="button-content">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="5" r="3"/>
+                        <path d="M10 22v-5l-2-1v-3a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v3l-2 1v5"/>
+                    </svg>
+                    Piéton
+                </div>
+            </button>
+            <button onclick="handleVisualResponse('car')">
+                <div class="button-content">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/>
+                        <circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/>
+                    </svg>
+                    Voiture
+                </div>
+            </button>
+            <button onclick="handleVisualResponse('bicycle')">
+                <div class="button-content">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/>
+                        <path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/>
+                    </svg>
+                    Vélo
+                </div>
+            </button>
+            <button onclick="handleVisualResponse('bus')">
+                <div class="button-content">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8 6v6m8-6v6"/><rect width="16" height="16" x="4" y="3" rx="2"/>
+                        <path d="M4 11h16"/><path d="M8 15h.01"/><path d="M16 15h.01"/>
+                        <path d="M19 19v2"/><path d="M5 19v2"/>
+                    </svg>
+                    Bus
+                </div>
+            </button>
+        </div>
+
+        <div id="instruction" class="instruction"></div>
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <div class="status">
+        <div class="status-item">Visuel (Centre): <span id="visual-status">-</span></div>
+        <div class="status-item">Visuel (Périphérie): <span id="peripheral-status">-</span></div>
+    </div>
+
+    <button id="start-button" onclick="startTrial()" disabled>Commencer</button>
+    <div id="stats">
+        Score: <span id="score">0/0</span> 
+        (<span id="percentage">0%</span>)
+    </div>
+    <div id="endLevelModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-text">
+                <h1 id="endLevelTitle">Niveau terminé!</h1>
+                
+                <div class="stats-summary">
+                    <div class="stats-item">
+                        <strong>Nombre d'essais:</strong> <span id="totalTrials">0</span>
+                    </div>
+                    <div class="stats-item">
+                        <strong>Réussite:</strong> <span id="successRate">0%</span>
+                    </div>
+                    <div class="stats-item">
+                        <strong>Temps de présentation final:</strong> <span id="finalPresentationTime">0</span> ms
+                    </div>
+                    <div class="stats-item">
+                        <strong>Seuil à atteindre:</strong> <span id="thresholdValue">0</span> ms
+                    </div>
+                </div>
+                
+                <div class="level-chart-container">
+                    <h2>Évolution du temps de présentation</h2>
+                    <div id="levelChart" class="level-chart">
+                        <!-- Le graphique sera généré ici par JavaScript -->
+                    </div>
+                </div>
+                
+                <p id="endLevelMessage" class="end-level-message"></p>
+            </div>
+            <button id="nextLevelBtn" class="close-btn" onclick="goToNextTask()">Continuer</button>
+        </div>
+    </div>
+    <div id="endLevelModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-text">
+                <h1 id="endLevelTitle">Niveau terminé!</h1>
+                
+                <div class="stats-summary">
+                    <div class="stats-item">
+                        <strong>Nombre d'essais:</strong> <span id="totalTrials">0</span>
+                    </div>
+                    <div class="stats-item">
+                        <strong>Réussite:</strong> <span id="successRate">0%</span>
+                    </div>
+                    <div class="stats-item">
+                        <strong>Temps de présentation final:</strong> <span id="finalPresentationTime">0</span> ms
+                    </div>
+                    <div class="stats-item">
+                        <strong>Seuil à atteindre:</strong> <span id="thresholdValue">0</span> ms
+                    </div>
+                </div>
+                
+                <div class="level-chart-container">
+                    <h2>Évolution du temps de présentation</h2>
+                    <div id="levelChart" class="level-chart">
+                        <!-- Le graphique sera généré ici par JavaScript -->
+                    </div>
+                </div>
+                
+                <p id="endLevelMessage" class="end-level-message"></p>
+            </div>
+            <button id="nextLevelBtn" class="close-btn" onclick="goToNextTask()">Continuer</button>
+        </div>
+    </div> 
+<script>
+        window.stimSizePX = 50; // Taille en pixels pour 5mm réels (par défaut)
+        window.maxRadiusReal = 100; // Rayon maximal en pixels pour 17cm réels (par défaut)
+        //début application calibration
+        jatos.onLoad(() => {
+                        console.log("Study session data reçues dans task1:", jatos.studySessionData);
+                        
+                        // Appliquer la calibration dès que les données JATOS sont disponibles
+                applyCalibration();
+                
+                // Vous pouvez ajouter ici d'autres initialisations si nécessaire
+            });
+
+        function applyCalibration() {
+            try {
+                if (jatos && jatos.studySessionData) {
+                    console.log("Données de session complètes:", jatos.studySessionData);
+                    
+                    const scaleFactor = jatos.studySessionData.scaleFactor;
+                    const measuredValue = jatos.studySessionData.measuredValue;
+                    
+                    if (scaleFactor && measuredValue) {
+                        console.log(`Calibration trouvée. Facteur d'échelle: ${scaleFactor.toFixed(3)}`);
+                        
+                        // Appliquer au conteneur de tâche
+                        const taskContainer = document.getElementById('task-container');
+                        if (taskContainer) {
+                            const desiredSizeCM = 16; // Taille physique souhaitée en cm
+                            
+                            // Taille du conteneur
+                            const cssSizeCM = desiredSizeCM * (10 / measuredValue);
+                            taskContainer.style.width = `${cssSizeCM}cm`;
+                            taskContainer.style.height = `${cssSizeCM}cm`;
+                            
+                            // Calculer la taille des stimuli pour qu'ils fassent 5mm réels
+                            const stimSizeMM = 10;
+                            const stimSizeCM = stimSizeMM / 10; // Convertir en cm
+                            const stimSizeCSS = stimSizeCM * (10 / measuredValue);
+                            // Conversion approximative de cm CSS en pixels (varie selon l'écran)
+                            window.stimSizePX = Math.round(stimSizeCSS * 37.8);
+                            
+                            // Rayon maximal pour les positions = moitié de la taille du conteneur
+                            // Le rayon correspond à la distance du centre vers l'extérieur
+                            window.maxRadiusReal = Math.round((desiredSizeCM / 2) * (10 / measuredValue) * 37.8);
+                            document.documentElement.style.setProperty('--stim-size', `${window.stimSizePX}px`);
+                            console.log(`Calibration appliquée. Facteur d'échelle: ${scaleFactor.toFixed(3)}`);
+                            console.log(`Taille des stimuli: ${window.stimSizePX}px (${stimSizeMM}mm réels)`);
+                            console.log(`Rayon maximal: ${window.maxRadiusReal}px (${desiredSizeCM/2}cm réels)`);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Erreur lors de l'application de la calibration:", error);
+            }
+        }
+ //fin application calibration
+
+        // Configuration adaptative
+        const adaptiveConfig = {
+            trialsBeforeAdjustment: 5,    // Nombre d'essais avant ajustement
+            successThreshold: 0.75,        // Seuil de réussite (75%)
+            timeMultiplier: {              // Remplace timeAdjustment
+                increase: 1.2,             // Multiplicateur pour augmenter le temps (x1.2)
+                decrease: 0.8              // Multiplicateur pour diminuer le temps (x0.8)
+            },
+            timeConstraints: {
+                min: 12,                 // Temps minimum en ms
+                max: 2000,                // Temps maximum en ms
+                initial: 750             // Temps initial en ms
+            }
+        };
+
+        // Configuration et état
+        let state = {
+            isActive: false,
+            currentStimulus: null,
+            peripheralStimulus: null,
+            targetPosition: null,
+            currentPhase: 'none',
+            hasClicked: false,
+            responseTimeout: null,
+            presentationTime: adaptiveConfig.timeConstraints.initial,
+            responses: {
+                visual: null,
+                peripheral: null
+            },
+            score: {
+                correct: 0,
+                total: 0,
+                recentResults: []  // Pour le calcul adaptatif
+            }
+        };
+
+        let presentationTimeHistory = [];
+        let trialData = [];
+        let trialCount = 0;
+        let centralResponseTime = null;
+        let peripheralResponseTime = null;
+
+        function generateRandomPosition(maxRadius) {
+            // Taille minimale = taille du stimulus
+            const minRadius = window.stimSizePX || 80;
+            
+            // Ajuster le rayon maximum en fonction du nombre d'essais
+            let adjustedMaxRadius;
+            if (trialCount <= 7) {
+                adjustedMaxRadius = maxRadius * 0.5; 
+            } else if (trialCount <= 14) {
+                adjustedMaxRadius = maxRadius * 0.65;  
+            } else if (trialCount <= 21) {
+                adjustedMaxRadius = maxRadius * 0.80; 
+            } else {
+                adjustedMaxRadius = maxRadius;        
+            }
+
+            const angle = Math.random() * 2 * Math.PI;
+            const r = Math.sqrt(Math.random() * (adjustedMaxRadius * adjustedMaxRadius - minRadius * minRadius) + minRadius * minRadius);
+            
+            return {
+                x: Math.cos(angle) * r,
+                y: Math.sin(angle) * r
+            };
+        }
+
+        function updatePresentationTime() {
+            if (state.score.recentResults.length >= adaptiveConfig.trialsBeforeAdjustment) {
+                // Calculer le taux de réussite moyen sur les derniers essais
+                const recentSuccess = state.score.recentResults
+                    .slice(-adaptiveConfig.trialsBeforeAdjustment)
+                    .reduce((sum, val) => sum + val, 0);
+                const successRate = recentSuccess / adaptiveConfig.trialsBeforeAdjustment;
+
+                let newTime = state.presentationTime;
+                if (successRate >= adaptiveConfig.successThreshold) {
+                    // Diminuer le temps si le taux de réussite est suffisant
+                    newTime = Math.max(
+                        adaptiveConfig.timeConstraints.min,
+                        Math.round(state.presentationTime * adaptiveConfig.timeMultiplier.decrease)
+                    );
+                } else {
+                    // Augmenter le temps si le taux de réussite est insuffisant
+                    newTime = Math.min(
+                        adaptiveConfig.timeConstraints.max,
+                        Math.round(state.presentationTime * adaptiveConfig.timeMultiplier.increase)
+                    );
+                }
+
+                if (newTime !== state.presentationTime) {
+                    const oldTime = state.presentationTime;  // Stocker l'ancienne valeur
+                    state.presentationTime = newTime;
+                    document.getElementById('current-duration').textContent = newTime;
+                    
+                  
+                    const threshold = 25; // Seuil pour task2.html
+                    
+                    if (newTime <= threshold) { // Seuil de passage au niveau supérieur
+                        // IMPORTANT: Arrêter le timer
+                        if (practiceTimer) {
+                            clearInterval(practiceTimer);
+                            practiceTimer = null;
+                        }
+                        
+                        const feedback = document.getElementById('feedback');
+                        feedback.textContent = 'Niveau maximum atteint - Passage au niveau suivant';
+                        feedback.className = 'instruction';
+                        feedback.style.display = 'block';
+                        
+                        setTimeout(() => {
+                            showEndLevelModal(true);
+                        }, 1500);
+                        return; // Pour éviter d'afficher d'autres feedbacks
+                    }
+                    
+                    // Comparer avec l'ancienne valeur
+                    if (newTime > oldTime) {
+                        const feedback = document.getElementById('feedback');
+                        feedback.textContent = 'Difficulté diminuée - Temps augmenté';
+                        feedback.style.color = 'black';  
+                        feedback.className = 'feedback incorrect';
+                        feedback.style.display = 'block';
+                        setTimeout(() => feedback.style.display = 'none', 2000);
+                    }
+                    else if (newTime < oldTime) {
+                        const feedback = document.getElementById('feedback');
+                        feedback.textContent = 'Difficulté augmentée - Temps diminué';
+                        feedback.style.color = 'black';  
+                        feedback.className = 'feedback correct';
+                        feedback.style.display = 'block';
+                        setTimeout(() => feedback.style.display = 'none', 2000);
+                    }
+                }
+                // Réinitialiser le tableau des résultats récents
+                state.score.recentResults = [];
+            }
+            
+            // Suivre l'évolution du temps de présentation
+            trackPresentationTime();
+        }
+
+        function startTrial() {
+            if (state.isActive) return;
+            
+            resetTrial();
+            state.trialStartTime = Date.now();
+            state.centralResponseTime = null;
+            state.peripheralResponseTime = null;
+            state.isActive = true;
+            document.getElementById('start-button').disabled = true;
+            
+            // Réinitialiser les statuts
+            ['visual', 'peripheral'].forEach(type => {
+                document.getElementById(`${type}-status`).textContent = '-';
+            });
+            
+            // Sélection aléatoire des stimuli
+            const availableTypes = ['pedestrian', 'car', 'bicycle', 'bus'];
+            state.currentStimulus = availableTypes.splice(Math.floor(Math.random() * availableTypes.length), 1)[0];
+            state.peripheralStimulus = availableTypes.splice(Math.floor(Math.random() * availableTypes.length), 1)[0];
+            
+            // Utiliser le rayon calibré
+            const radius = window.maxRadiusReal || 250;
+            state.targetPosition = generateRandomPosition(radius);
+
+            // Configurer le stimulus central avec taille calibrée
+            const stimulus = document.getElementById('stimulus');
+            stimulus.innerHTML = document.querySelector(`button[onclick="handleVisualResponse('${state.currentStimulus}')"] svg`).outerHTML;
+            stimulus.style.width = `${window.stimSizePX || 80}px`;
+            stimulus.style.height = `${window.stimSizePX || 80}px`;
+            stimulus.style.display = 'block';
+
+            // Configurer le stimulus périphérique avec taille calibrée
+            const target = document.getElementById('target');
+            target.innerHTML = document.querySelector(`button[onclick="handleVisualResponse('${state.peripheralStimulus}')"] svg`).outerHTML;
+            target.style.width = `${window.stimSizePX || 80}px`;
+            target.style.height = `${window.stimSizePX || 80}px`;
+            target.style.left = `calc(50% + ${state.targetPosition.x}px)`;
+            target.style.top = `calc(50% + ${state.targetPosition.y}px)`;
+            target.style.display = 'block';
+
+            // Cacher les stimuli après le délai de présentation
+            setTimeout(() => {
+                stimulus.style.display = 'none';
+                target.style.display = 'none';
+            }, state.presentationTime);
+
+            // Afficher les options après le temps de présentation
+            setTimeout(() => {
+                state.currentPhase = 'central';
+                document.getElementById('instruction').textContent = 'Identifiez l\'objet central';
+                document.getElementById('instruction').style.display = 'block';
+                document.getElementById('visual-options').style.display = 'flex';
+            }, state.presentationTime + 50);
+        }
+
+        function getElapsedSeconds() {
+            if (practiceStartTime === null) return 0;
+            return Math.floor((Date.now() - practiceStartTime));
+        }
+
+        function handleVisualResponse(response) {   
+            if (!state.isActive) return;
+
+            if (state.currentPhase === 'central') {
+                state.centralResponseTime = Date.now() - state.trialStartTime;
+                state.responses.visual = response === state.currentStimulus;
+                document.getElementById('visual-status').textContent = state.responses.visual ? '✓' : '✗';
+                document.getElementById('visual-options').style.display = 'none';
+
+                // Démarrer le timing pour la réponse périphérique
+                state.peripheralStartTime = Date.now();
+                
+                state.currentPhase = 'peripheral';
+                document.getElementById('instruction').textContent = 'Identifiez l\'objet périphérique';
+                document.getElementById('visual-options').style.display = 'flex';
+            }  
+            else if (state.currentPhase === 'peripheral') {
+                state.peripheralResponseTime = Date.now() - state.peripheralStartTime;
+                state.responses.peripheral = response === state.peripheralStimulus;
+                document.getElementById('peripheral-status').textContent = state.responses.peripheral ? '✓' : '✗';
+                
+                // Calculer l'excentricité (distance au centre)
+                const excentricite = Math.sqrt(
+                    Math.pow(state.targetPosition.x, 2) + 
+                    Math.pow(state.targetPosition.y, 2)
+                );
+
+                trialCount = trialCount + 1;
+                trialData.push([
+                    trialCount,                          // numéro essai
+                    state.presentationTime,              // temps présentation
+                    state.centralResponseTime,           // temps réponse centrale
+                    state.responses.visual ? 1 : 0,      // réussite centrale
+                    state.peripheralResponseTime,        // temps réponse périphérique
+                    state.responses.peripheral ? 1 : 0,  // réussite périphérique
+                    Math.round(excentricite),            // distance au centre en pixels
+                    getElapsedSeconds()                // temps écoulé en secondes
+                ]);
+                
+                const allCorrect = state.responses.visual && state.responses.peripheral;
+                state.score.recentResults.push(allCorrect ? 1 : 0);
+                
+                updateScore(allCorrect);
+                updatePresentationTime();
+                endTrial();
+            }
+        }
+
+        function resetTrial() {
+            state.isActive = false;
+            state.currentPhase = 'none';
+            state.hasClicked = false;
+            state.responses = { visual: null, peripheral: null };
+            
+            if (state.responseTimeout) {
+                clearTimeout(state.responseTimeout);
+                state.responseTimeout = null;
+            }
+            
+            ['response-marker', 'visual-options', 'feedback', 'instruction'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.style.display = 'none';
+            });
+            
+            document.getElementById('start-button').disabled = false;
+            
+            ['visual', 'peripheral'].forEach(type => {
+                document.getElementById(`${type}-status`).textContent = '-';
+            });
+        }
+
+        function endTrial() {
+            state.isActive = false;
+            document.getElementById('visual-options').style.display = 'none';
+            document.getElementById('instruction').style.display = 'none';
+            
+            setTimeout(() => {
+                document.getElementById('start-button').disabled = false;
+            }, 50);
+        }
+
+        function showFeedback(correct) {
+            const feedback = document.getElementById('feedback');
+            let message = correct ? 'Correct !' : 'Incorrect. ';
+            if (!correct) {
+                if (!state.responses.visual) message += 'Objet central incorrect. ';
+                if (!state.responses.peripheral) message += 'Objet périphérique incorrect. ';
+            }
+            
+            feedback.textContent = message;
+            feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+            feedback.style.display = 'block';
+            
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 2000);
+        }
+
+        function updateScore(correct) {
+            state.score.total++;
+            if (correct) state.score.correct++;
+            
+            document.getElementById('score').textContent = 
+                `${state.score.correct}/${state.score.total}`;
+            document.getElementById('percentage').textContent = 
+                `${Math.round(state.score.correct/state.score.total * 100)}%`;
+        }
+
+                // Ajouter l'écouteur d'événement pour la touche espace
+        document.addEventListener('keydown', function(event) {
+          // Vérifier si le modal est fermé (display: none)
+            const modalVisible = document.getElementById('instructionsModal').style.display !== 'none';
+            
+            if ((event.keyCode === 32 || event.code === 'Space') && !modalVisible) {
+                // Empêcher le défilement de la page
+                event.preventDefault();
+                
+                // Ne lancer un nouvel essai que si le précédent est terminé
+                if (!state.isActive) {
+                    startTrial();
+                }
+            }
+        });
+        // Initialisation du temps de présentation dans l'affichage
+        document.getElementById('current-duration').textContent = state.presentationTime;
+
+         //Gestion timing 
+
+        const PRACTICE_TIME = 5 * 60 * 1000;
+        let practiceStartTime = null;
+        let practiceTimer = null;
+
+        function formatTimeRemaining(milliseconds) {
+            const minutes = Math.floor(milliseconds / 60000);
+            const seconds = Math.floor((milliseconds % 60000) / 1000);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimeDisplay() {
+            if (practiceStartTime) {
+                const elapsedTime = Date.now() - practiceStartTime;
+                const remainingTime = Math.max(0, PRACTICE_TIME - elapsedTime);
+                const timeDisplay = document.getElementById('time-remaining');
+                timeDisplay.textContent = formatTimeRemaining(remainingTime);
+                
+                if (remainingTime < 60000) {
+                    timeDisplay.style.color = '#dc3545';
+                } else {
+                    timeDisplay.style.color = '#000000';
+                }
+            }
+        }
+
+        const originalStartTrial = startTrial;
+        startTrial = function() {
+            if (!state.isActive) {
+                if (practiceStartTime === null) {
+                    practiceStartTime = Date.now();
+                    startPracticeTimer();
+                }
+                originalStartTrial();
+            }
+        }
+
+        function startPracticeTimer() {
+            updateTimeDisplay();
+            
+            practiceTimer = setInterval(() => {
+                updateTimeDisplay();
+                
+                const elapsedTime = Date.now() - practiceStartTime;
+                if (elapsedTime >= PRACTICE_TIME) {
+                    clearInterval(practiceTimer);
+                    
+                    const feedback = document.getElementById('feedback');
+                    feedback.textContent = 'Passage à la tâche suivante...';
+                    feedback.className = 'instruction';
+                    feedback.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        showEndLevelModal(false); // false = niveau non réussi (temps écoulé)
+                    }, 1500);
+                }
+            }, 1000);
+        }
+
+        function getElapsedSeconds() {
+            if (practiceStartTime === null) return 0;
+            return Math.floor((Date.now() - practiceStartTime));
+        }
+
+        // Début ecran de fin 
+        function trackPresentationTime() {
+            presentationTimeHistory.push({
+            trialNum: trialCount,
+            time: state.presentationTime
+            });
+        }
+
+        function showEndLevelModal(levelCompleted) {
+            // Calculer les statistiques
+            const totalTrials = trialCount;
+            const successRate = Math.round((state.score.correct / state.score.total) * 100) || 0;
+            const finalTime = state.presentationTime;
+            const threshold = 25; // Seuil défini manuellement pour le niveau 1
+            
+            // Déterminer si le seuil est réellement atteint
+            // Pour le niveau 1, on veut que le temps soit <= 12ms
+            const isThresholdReached = finalTime <= threshold;
+            
+            console.log("Temps final:", finalTime, "ms");
+            console.log("Seuil:", threshold, "ms");
+            console.log("Seuil atteint?", isThresholdReached);
+            
+            // Utiliser la valeur réelle basée sur la comparaison avec le seuil, 
+            // indépendamment de ce qui a été passé à la fonction
+            levelCompleted = isThresholdReached;
+            
+            // Mettre à jour les éléments de la modale
+            document.getElementById('totalTrials').textContent = totalTrials;
+            document.getElementById('successRate').textContent = successRate + '%';
+            document.getElementById('finalPresentationTime').textContent = finalTime;
+            document.getElementById('thresholdValue').textContent = threshold; // Affiche le seuil cible
+            
+            // Définir le titre et le message
+            if (levelCompleted) {
+                document.getElementById('endLevelTitle').textContent = '🎉 Niveau réussi! 🎉';
+                document.getElementById('endLevelMessage').textContent = 'Félicitations! Vous avez atteint le seuil de temps minimum requis.';
+                document.getElementById('endLevelMessage').className = 'end-level-message message-success';
+            } else {
+                document.getElementById('endLevelTitle').textContent = 'Niveau non terminé';
+                
+                if (finalTime > threshold) {
+                    document.getElementById('endLevelMessage').textContent = `Le temps de présentation (${finalTime}ms) n'a pas atteint le seuil requis (${threshold}ms). Continuons avec le niveau suivant.`;
+                } else {
+                    document.getElementById('endLevelMessage').textContent = 'Le temps imparti est écoulé. Continuons avec le niveau suivant.';
+                }
+                
+                document.getElementById('endLevelMessage').className = 'end-level-message message-failure';
+            }
+            
+            // Générer le graphique
+            generateChart();
+            
+            // Afficher la modale
+            document.getElementById('endLevelModal').style.display = 'flex';
+        }
+
+        function generateChart() {
+            const chartContainer = document.getElementById('levelChart');
+            chartContainer.innerHTML = ''; // Vider le conteneur
+            
+            // S'il n'y a pas de données, ne pas continuer
+            if (presentationTimeHistory.length === 0) {
+                chartContainer.innerHTML = '<p style="text-align: center;">Aucune donnée disponible</p>';
+                return;
+            }
+            
+            // Créer un conteneur pour le graphique avec des marges pour les axes
+            const chartWrapper = document.createElement('div');
+            chartWrapper.style.position = 'relative';
+            chartWrapper.style.height = '100%';
+            chartWrapper.style.width = '100%';
+            chartWrapper.style.padding = '30px 10px 30px 40px';
+            chartWrapper.style.boxSizing = 'border-box';
+            chartContainer.appendChild(chartWrapper);
+            
+            // Créer le conteneur pour les points du graphique
+            const plotArea = document.createElement('div');
+            plotArea.style.position = 'relative';
+            plotArea.style.height = '100%';
+            plotArea.style.width = '100%';
+            plotArea.style.backgroundColor = '#f8f9fa';
+            plotArea.style.borderRadius = '4px';
+            chartWrapper.appendChild(plotArea);
+            
+            // Déterminer les valeurs min et max pour l'échelle
+            let minTime = Math.min(...presentationTimeHistory.map(item => item.time));
+            let maxTime = Math.max(...presentationTimeHistory.map(item => item.time));
+            
+            // Assurer que le minimum est au moins 0 et que le delta entre min et max est au moins 100
+            minTime = Math.floor(Math.max(0, minTime) / 100) * 100; // Arrondir au multiple de 100 inférieur
+            maxTime = Math.ceil(Math.max(minTime + 100, maxTime) / 100) * 100; // Arrondir au multiple de 100 supérieur
+            
+            // Définition manuelle du seuil - À MODIFIER selon le niveau
+            // task1.html: 12, task2.html: 50, task3.html: 150, task4.html: 200
+            const threshold = 25; // Seuil défini manuellement
+            
+            // Ajouter des lignes de grille horizontales
+            const numGridLines = 5;
+            for (let i = 0; i <= numGridLines; i++) {
+                const gridLine = document.createElement('div');
+                gridLine.style.position = 'absolute';
+                gridLine.style.left = '0';
+                gridLine.style.right = '0';
+                gridLine.style.top = `${(i / numGridLines) * 100}%`;
+                gridLine.style.height = '1px';
+                gridLine.style.backgroundColor = '#dee2e6';
+                gridLine.style.zIndex = '1';
+                plotArea.appendChild(gridLine);
+                
+                // Valeur sur l'axe Y
+                const gridValue = Math.round(maxTime - ((maxTime - minTime) * (i / numGridLines)));
+                const gridLabel = document.createElement('div');
+                gridLabel.style.position = 'absolute';
+                gridLabel.style.right = '100%';
+                gridLabel.style.top = `${(i / numGridLines) * 100}%`;
+                gridLabel.style.transform = 'translate(-5px, -50%)';
+                gridLabel.style.fontSize = '10px';
+                gridLabel.style.color = '#6c757d';
+                gridLabel.textContent = gridValue + ' ms';
+                gridLabel.style.zIndex = '2';
+                chartWrapper.appendChild(gridLabel);
+            }
+            
+            // Ajouter des points pour chaque essai
+            presentationTimeHistory.forEach((item, index) => {
+                const point = document.createElement('div');
+                point.style.position = 'absolute';
+                
+                // Calculer la position horizontale (X) du point - basée sur l'indice
+                const xPos = (index / (presentationTimeHistory.length - 1)) * 100;
+                point.style.left = `${xPos}%`;
+                
+                // Calculer la position verticale (Y) du point - basée sur le temps
+                const yPos = ((maxTime - item.time) / (maxTime - minTime)) * 100;
+                point.style.top = `${yPos}%`;
+                
+                // Style du point
+                point.style.width = '8px';
+                point.style.height = '8px';
+                point.style.backgroundColor = '#4CAF50';
+                point.style.borderRadius = '50%';
+                point.style.transform = 'translate(-50%, -50%)';
+                point.style.boxShadow = '0 0 2px rgba(0,0,0,0.3)';
+                point.style.zIndex = '3';
+                
+                // Tooltip pour afficher la valeur exacte
+                point.title = `Essai ${item.trialNum}: ${item.time} ms`;
+                
+                plotArea.appendChild(point);
+            });
+            
+            // Ajouter une ligne de connexion entre les points
+            const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            polyline.style.position = 'absolute';
+            polyline.style.top = '0';
+            polyline.style.left = '0';
+            polyline.style.width = '100%';
+            polyline.style.height = '100%';
+            polyline.style.zIndex = '2';
+            polyline.style.overflow = 'visible';
+            polyline.setAttribute('viewBox', '0 0 100 100');
+            polyline.setAttribute('preserveAspectRatio', 'none');
+            
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const pathData = presentationTimeHistory.map((item, index) => {
+                const x = (index / (presentationTimeHistory.length - 1)) * 100;
+                const y = ((maxTime - item.time) / (maxTime - minTime)) * 100;
+                return (index === 0 ? 'M' : 'L') + x + ',' + y;
+            }).join(' ');
+            
+            path.setAttribute('d', pathData);
+            path.setAttribute('stroke', '#4CAF50');
+            path.setAttribute('stroke-width', '1.5');
+            path.setAttribute('fill', 'none');
+            polyline.appendChild(path);
+            plotArea.appendChild(polyline);
+            
+            // Ajouter une ligne pour le seuil si dans la plage du graphique
+            if (threshold >= minTime && threshold <= maxTime) {
+                const thresholdLine = document.createElement('div');
+                thresholdLine.style.position = 'absolute';
+                thresholdLine.style.left = '0';
+                thresholdLine.style.width = '100%';
+                thresholdLine.style.height = '2px';
+                thresholdLine.style.backgroundColor = '#dc3545';
+                thresholdLine.style.zIndex = '5';
+                
+                // Calculer la position verticale de la ligne de seuil
+                const thresholdPosition = ((maxTime - threshold) / (maxTime - minTime)) * 100;
+                thresholdLine.style.top = `${thresholdPosition}%`;
+                
+                // Ajouter une étiquette pour le seuil
+                const thresholdLabel = document.createElement('div');
+                thresholdLabel.style.position = 'absolute';
+                thresholdLabel.style.right = '0';
+                thresholdLabel.style.top = `${thresholdPosition}%`;
+                thresholdLabel.style.transform = 'translate(5px, -50%)';
+                thresholdLabel.style.fontSize = '10px';
+                thresholdLabel.style.color = '#dc3545';
+                thresholdLabel.style.fontWeight = 'bold';
+                thresholdLabel.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+                thresholdLabel.style.padding = '2px 4px';
+                thresholdLabel.style.borderRadius = '2px';
+                thresholdLabel.style.zIndex = '6';
+                thresholdLabel.textContent = `Seuil: ${threshold}ms`;
+                
+                plotArea.appendChild(thresholdLine);
+                chartWrapper.appendChild(thresholdLabel);
+            }
+            
+            // Ajouter l'axe Y (axe vertical)
+            const yAxis = document.createElement('div');
+            yAxis.style.position = 'absolute';
+            yAxis.style.left = '0';
+            yAxis.style.top = '0';
+            yAxis.style.height = '100%';
+            yAxis.style.width = '1px';
+            yAxis.style.backgroundColor = '#adb5bd';
+            yAxis.style.zIndex = '4';
+            chartWrapper.appendChild(yAxis);
+            
+            // Ajouter le titre de l'axe Y
+            const yAxisTitle = document.createElement('div');
+            yAxisTitle.style.position = 'absolute';
+            yAxisTitle.style.transform = 'rotate(-90deg)';
+            yAxisTitle.style.transformOrigin = 'left top';
+            yAxisTitle.style.left = '5px';
+            yAxisTitle.style.top = '50%';
+            yAxisTitle.style.fontSize = '10px';
+            yAxisTitle.style.color = '#6c757d';
+            yAxisTitle.textContent = 'Temps (ms)';
+            chartWrapper.appendChild(yAxisTitle);
+            
+            // Ajouter l'axe X (axe horizontal)
+            const xAxis = document.createElement('div');
+            xAxis.style.position = 'absolute';
+            xAxis.style.left = '0';
+            xAxis.style.bottom = '0';
+            xAxis.style.width = '100%';
+            xAxis.style.height = '1px';
+            xAxis.style.backgroundColor = '#adb5bd';
+            xAxis.style.zIndex = '4';
+            chartWrapper.appendChild(xAxis);
+            
+            // Ajouter le titre de l'axe X
+            const xAxisTitle = document.createElement('div');
+            xAxisTitle.style.position = 'absolute';
+            xAxisTitle.style.left = '50%';
+            xAxisTitle.style.bottom = '5px';
+            xAxisTitle.style.transform = 'translateX(-50%)';
+            xAxisTitle.style.fontSize = '10px';
+            xAxisTitle.style.color = '#6c757d';
+            xAxisTitle.textContent = 'Essais';
+            chartWrapper.appendChild(xAxisTitle);
+            
+            // Ajouter des étiquettes d'essai sur l'axe X pour quelques points
+            const numXLabels = Math.min(5, presentationTimeHistory.length);
+            for (let i = 0; i < numXLabels; i++) {
+                const index = Math.floor(i * (presentationTimeHistory.length - 1) / (numXLabels - 1));
+                const item = presentationTimeHistory[index];
+                
+                const label = document.createElement('div');
+                label.style.position = 'absolute';
+                label.style.bottom = '-15px';
+                label.style.left = `${(index / (presentationTimeHistory.length - 1)) * 100}%`;
+                label.style.transform = 'translateX(-50%)';
+                label.style.fontSize = '10px';
+                label.style.color = '#6c757d';
+                label.textContent = item.trialNum;
+                chartWrapper.appendChild(label);
+            }
+        }
+
+        // Fonction pour obtenir le seuil de temps pour la tâche actuelle
+        function getThresholdForCurrentTask() {
+            // Ces valeurs doivent correspondre aux seuils définis dans chaque tâche
+            const taskPage = window.location.pathname.split('/').pop();
+            if (taskPage.includes('task1.html')) return 12;
+            if (taskPage.includes('task2.html')) return 50;
+            if (taskPage.includes('task3.html')) return 250;
+            if (taskPage.includes('task4.html')) return 300;
+            return 100; // Valeur par défaut
+        }  
+        // Fin impélmentation fin de niveau 
+
+        function goToNextTask() {
+        clearInterval(practiceTimer);
+
+        const formattedData = trialData.map(trial => {
+            return {
+                participant_id: jatos.studySessionData.participantId,
+                session_id: jatos.studySessionData.sessionId,
+                trial_num: trial[0],
+                presentation_time: trial[1],
+                central_rt: trial[2],
+                central_success: trial[3],
+                peripheral_rt: trial[4],
+                peripheral_success: trial[5],
+                target_distance: trial[6],
+                elapsed_time: trial[7]  
+            };
+            });
+
+                const headers = ['participant_id', 'session_id', 'trial_num', 'presentation_time',
+                    'central_rt', 'central_success', 'peripheral_rt', 'peripheral_success',
+                    'target_distance', 'elapsed_time'];
+                
+                const csvRows = formattedData.map(row => 
+                    headers.map(header => row[header]).join(',')
+                );
+
+                const csvContent = csvRows.join('\n');
+                document.getElementById('endLevelModal').style.display = 'none';
+                jatos.startNextComponent(csvContent);
+        }
+
+        window.addEventListener('beforeunload', () => {
+            if (practiceTimer) {
+                clearInterval(practiceTimer);
+            }
+        });
+
+        function closeModal() {
+            document.getElementById('instructionsModal').style.display = 'none';
+            document.getElementById('start-button').disabled = false;
+        }
+    </script>
+</body>
+</html>

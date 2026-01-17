@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jatos.js"></script>
+    <title>Fin de l'Entrainement</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .evaluation-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #e9ecef;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+        .rating-container {
+            margin: 20px 0;
+        }
+        .rating-scale {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 15px;
+        }
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        .scale {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .scale-value {
+            font-size: 12px;
+            color: #555;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .selected-value {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 5px;
+            font-size: 18px;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .submit-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+        .rsme-container {
+            margin: 20px 0;
+        }
+        .rsme-scale-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+        .rsme-label {
+            font-size: 12px;
+            color: #555;
+            text-align: center;
+            flex-basis: 20%;
+        }
+        input[type="range"].rsme-slider {
+            width: 100%;
+            margin: 15px 0;
+            height: 20px;
+        }
+        .rsme-selected-value {
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bravo, entraînement terminé ! 🎉</h1>
+        <p>Avant de terminer, merci de répondre à ces deux courtes questions.</p>
+        
+        <div class="evaluation-section">
+            <h2>Auto-évaluation de votre performance</h2>
+            <p>Sur une échelle de 0 à 10, comment évaluez-vous votre performance durant cet entraînement ?</p>
+            
+            <div class="rating-container">
+                <div class="scale-labels">
+                    <span class="scale-value">0<br>(Très mauvaise)</span>
+                    <span class="scale-value">2</span>
+                    <span class="scale-value">4</span>
+                    <span class="scale-value">6</span>
+                    <span class="scale-value">8</span>
+                    <span class="scale-value">10<br>(Excellente)</span>
+                </div>
+                <input type="range" id="performanceRating" min="0" max="10" step="1" value="5">
+                <div class="selected-value">Votre évaluation : <span id="performanceValue">5</span>/10</div>
+            </div>
+        </div>
+        
+        <div class="evaluation-section">
+            <h2>Échelle d'effort mental (RSME)</h2>
+            <p>À quel point cet entraînement a-t-il demandé un effort mental ?</p>
+            
+            <div class="rsme-container">
+                <div class="rsme-scale-labels">
+                    <span class="rsme-label">Aucun effort<br>0</span>
+                    <span class="rsme-label">Effort léger<br>30</span>
+                    <span class="rsme-label">Effort modéré<br>60</span>
+                    <span class="rsme-label">Effort important<br>90</span>
+                    <span class="rsme-label">Effort extrême<br>150</span>
+                </div>
+                <input type="range" id="rsmeSlider" class="rsme-slider" min="0" max="150" step="1" value="50">
+                <div class="rsme-selected-value">Niveau d'effort : <span id="rsmeValue">50</span>/150</div>
+            </div>
+        </div>
+        
+        <div class="button-container">
+            <button id="submitButton" class="submit-button">Terminer l'étude</button>
+        </div>
+    </div>
+
+    <script>
+        // Mise à jour des valeurs affichées lors du déplacement des curseurs
+        document.getElementById('performanceRating').addEventListener('input', function() {
+            document.getElementById('performanceValue').textContent = this.value;
+        });
+        
+        document.getElementById('rsmeSlider').addEventListener('input', function() {
+            document.getElementById('rsmeValue').textContent = this.value;
+        });
+        
+        // Gestion de la soumission
+        document.getElementById('submitButton').addEventListener('click', function() {
+            const performanceRating = document.getElementById('performanceRating').value;
+            const rsmeRating = document.getElementById('rsmeSlider').value;
+            
+            // Créer l'objet de résultats
+            const results = {
+                participant_id: jatos.studySessionData.participantId,
+                session_id: jatos.studySessionData.sessionId,
+                performance_rating: performanceRating,
+                rsme_rating: rsmeRating,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Convertir en format CSV
+            const headers = ['participant_id', 'session_id', 'performance_rating', 'rsme_rating', 'timestamp'];
+            const csvRow = headers.map(header => results[header]).join(',');
+            const csvContent = headers.join(',') + '\n' + csvRow;
+            
+            // Envoyer les résultats à JATOS et terminer l'étude
+            jatos.endStudy(csvContent, true);
+        });
+    </script>
+</body>
+</html>

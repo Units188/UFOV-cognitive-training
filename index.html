@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Entraînement Cognitif - Accueil</title>
+    <meta charset="UTF-8">
+    <script src="jatos.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .error {
+            color: red;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .status.error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        .status.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        .distance-notice {
+        background-color: #e8f4f8;
+        border-left: 4px solid #4b9cd3;
+        border-radius: 6px;
+        padding: 15px 20px;
+        margin: 25px 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease;
+    }
+    
+    .distance-notice:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .distance-notice h3 {
+        margin-top: 0;
+        margin-bottom: 12px;
+        color: #2a5a8a;
+    }
+    
+    .distance-content {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .distance-icon {
+        flex-shrink: 0;
+        color: #4b9cd3;
+    }
+    
+    .distance-text {
+        flex-grow: 1;
+    }
+    
+    .distance-text p {
+        margin: 0 0 10px 0;
+        line-height: 1.5;
+    }
+    
+    .distance-text p:last-child {
+        margin-bottom: 0;
+    }
+    
+    .distance-tip {
+        font-size: 0.9em;
+        color: #555;
+        font-style: italic;
+    }
+    
+    @media (max-width: 600px) {
+        .distance-content {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+
+    .environment-notice {
+        background-color: #f0f7e6;
+        border-left: 4px solid #6ca439;
+        border-radius: 6px;
+        padding: 15px 20px;
+        margin: 25px 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .recommendations {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .recommendation-item {
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .recommendation-icon {
+        flex-shrink: 0;
+        color: #6ca439;
+    }
+    
+    .recommendation-text {
+        flex-grow: 1;
+    }
+    
+    .recommendation-text h4 {
+        margin: 0 0 8px 0;
+        color: #3f6b1f;
+    }
+    
+    .recommendation-text p {
+        margin: 0;
+        line-height: 1.5;
+    }
+    
+    @media (max-width: 600px) {
+        .recommendation-item {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Entraînement Cognitif</h1>
+       <div id="calibrationModal" style="display: block;">
+            <h2>Calibration de l'écran</h2>
+            <p>Pour garantir que les éléments s'affichent à la bonne taille physique sur votre écran :</p>
+            
+            <div style="margin: 30px auto; text-align: center;">
+                <div id="calibrationLine" style="display: inline-block; width: 10cm; height: 4px; background-color: black;"></div>
+                <p style="margin-top: 10px;"><strong>↑ Mesurez cette ligne avec une règle ↑</strong></p>
+            </div>
+            
+            <div class="form-group">
+                <label for="measuredLength">Longueur mesurée de la ligne (en cm) :</label>
+                <input type="number" id="measuredLength" min="5" max="15" step="0.1" placeholder="10.0">
+                <p class="error" id="calibrationError">Veuillez entrer une valeur entre 5 et 15 cm.</p>
+            </div>
+            
+            <button type="button" id="calibrationButton" onclick="completeCalibration()">Valider la calibration</button>
+        </div>
+<div id="participantForm" style="display: none;">
+<!-- Le reste du formulaire existant -->
+        <form id="participantForm">
+            <div class="form-group">
+                <label for="participantId">Numéro de participant :</label>
+                <input type="text" id="participantId" required>
+                <div id="participantError" class="error">Veuillez entrer un numéro de participant valide.</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="sessionId">Session n°:</label>
+                <input type="number" id="sessionId" min="1" required>
+                <div id="sessionError" class="error">Veuillez entrer un numéro de session valide.</div>
+            </div>
+            
+            <button type="submit" id="submitButton" disabled>Commencer l'entraînement</button>
+        </form>
+        <div id="statusMessage" class="status"></div>
+    </div>
+
+    <div class="distance-notice">
+        <h3>📏 Distance et affichage recommandés</h3>
+        <div class="distance-content">
+            <div class="distance-icon">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                    <line x1="8" y1="21" x2="16" y2="21" />
+                    <line x1="12" y1="17" x2="12" y2="21" />
+                    <path d="M22 3l-7 5 7 5M2 12V3" />
+                    <path d="M2 7c4 0 8 0 8 5m0 0c0 5 4 5 8 5" stroke-dasharray="2" />
+                </svg>
+            </div>
+            <div class="distance-text">
+                <p>Pour des résultats optimaux, merci de vous positionner à <strong>40 cm maximum</strong> de votre écran durant toute la durée de l'entraînement.</p>
+                <p class="distance-tip">💡 Astuce : Cette distance correspond approximativement à la longueur de votre avant-bras.</p>
+                
+                <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #e0e9f2;">
+                    <p><strong>📺 Mode plein écran recommandé :</strong></p>
+                    <ul style="padding-left: 20px; margin-top: 5px;">
+                        <li><strong>Windows/Linux :</strong> Appuyez sur la touche <kbd style="background-color: #f0f0f0; padding: 2px 4px; border-radius: 3px; border: 1px solid #ccc;">F11</kbd></li>
+                        <li><strong>macOS :</strong> Utilisez <kbd style="background-color: #f0f0f0; padding: 2px 4px; border-radius: 3px; border: 1px solid #ccc;">⌘+Ctrl+F</kbd> ou allez dans <em>Présentation > Toujours afficher la barre d'outils en plein écran</em></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="environment-notice">
+    <h3>🔍 Conditions optimales</h3>
+    <div class="recommendations">
+        <div class="recommendation-item">
+            <div class="recommendation-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+                    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5z"/>
+                    <path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5z"/>
+                    <line x1="12" y1="12" x2="12" y2="12.01"/>
+                    <line x1="8" y1="12" x2="8" y2="12.01"/>
+                    <line x1="16" y1="12" x2="16" y2="12.01"/>
+                </svg>
+            </div>
+            <div class="recommendation-text">
+                <h4>Environnement calme</h4>
+                <p>Choisissez un espace tranquille, sans interruptions ni distractions. L'idéal est une pièce silencieuse où vous ne serez pas dérangé pendant la durée de l'entraînement.</p>
+            </div>
+        </div>
+
+        <div class="recommendation-item">
+            <div class="recommendation-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="5" width="15" height="10" rx="2" />
+                    <path d="M16 8l3 3-3 3" />
+                    <path d="m2 12 5-4v8z" />
+                </svg>
+            </div>
+            <div class="recommendation-text">
+                <h4>Utilisez une souris</h4>
+                <p>Pour une meilleure précision, utilisez une souris plutôt qu'un pavé tactile. Cela permettra des réponses plus précises, particulièrement pour les tâches qui nécessitent de cliquer à des endroits spécifiques.</p>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        // Variables globales pour la calibration
+let scaleFactor = 1.0;
+const REFERENCE_SIZE_CM = 10; // La ligne de calibration fait 10cm en CSS
+
+// Afficher la modale de calibration avant les instructions
+window.onload = function() {
+    // Cacher la modale d'instructions jusqu'à la fin de la calibration
+    document.getElementById('instructionsModal').style.display = 'none';
+    
+    // Afficher la modale de calibration
+    document.getElementById('calibrationModal').style.display = 'flex';
+}
+
+function completeCalibration() {
+    const measuredValue = parseFloat(document.getElementById('measuredLength').value);
+    const calibrationError = document.getElementById('calibrationError');
+    
+    // Validation de la mesure
+    if (isNaN(measuredValue) || measuredValue < 5 || measuredValue > 15) {
+        calibrationError.style.display = 'block';
+        return;
+    }
+    
+    // Masquer le message d'erreur si la validation est réussie
+    calibrationError.style.display = 'none';
+    
+    // Calculer le facteur d'échelle
+    // Si l'utilisateur mesure moins de 10cm, le facteur sera > 1 (on agrandit)
+    // Si l'utilisateur mesure plus de 10cm, le facteur sera < 1 (on réduit)
+    scaleFactor = REFERENCE_SIZE_CM / measuredValue;
+    
+    try {
+        // Initialiser studySessionData si nécessaire
+        if (!jatos.studySessionData) {
+            jatos.studySessionData = {};
+        }
+        
+        // Stocker le facteur d'échelle dans les données de session JATOS
+        jatos.studySessionData.scaleFactor = scaleFactor;
+        jatos.studySessionData.measuredValue = measuredValue; // Stocker aussi la valeur mesurée
+        
+        console.log(`Calibration complétée. Facteur d'échelle: ${scaleFactor.toFixed(3)}`);
+        console.log(`Valeur mesurée: ${measuredValue} cm (référence: ${REFERENCE_SIZE_CM} cm)`);
+        console.log("Données de session:", jatos.studySessionData);
+        
+        // Cacher la section de calibration
+        document.getElementById('calibrationModal').style.display = 'none';
+        
+        // Afficher le formulaire de participation
+        document.getElementById('participantForm').style.display = 'block';
+        
+        // Activer le bouton pour commencer l'entraînement
+        document.getElementById('submitButton').disabled = false;
+        
+        // Afficher un message de succès
+        const statusMessage = document.getElementById('statusMessage');
+        statusMessage.textContent = "Calibration réussie. Vous pouvez maintenant commencer l'entrainement";
+        statusMessage.style.display = 'block';
+        statusMessage.className = "status success";
+        
+    } catch (error) {
+        console.error('Erreur lors du stockage de la calibration:', error);
+        
+        const statusMessage = document.getElementById('statusMessage');
+        statusMessage.textContent = 'Une erreur est survenue lors de la calibration. Veuillez réessayer.';
+        statusMessage.style.display = 'block';
+        statusMessage.className = "status error";
+    }
+}
+
+jatos.onLoad(() => {
+    const form = document.getElementById('participantForm');
+    const submitButton = document.getElementById('submitButton');
+    const statusMessage = document.getElementById('statusMessage');
+
+    // Réinitialisation des champs
+    document.getElementById('participantId').value = '';
+    document.getElementById('sessionId').value = '';
+
+    function showStatus(message, type) {
+        statusMessage.textContent = message;
+        statusMessage.style.display = 'block';
+        statusMessage.className = `status ${type}`;
+    }
+
+    function hideErrors() {
+        document.getElementById('participantError').style.display = 'none';
+        document.getElementById('sessionError').style.display = 'none';
+        statusMessage.style.display = 'none';
+    }
+    
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        hideErrors();
+
+        const participantId = document.getElementById('participantId').value.trim();
+        const sessionId = document.getElementById('sessionId').value;
+        
+        // Récupérer les valeurs de calibration actuelles
+        const currentScaleFactor = jatos.studySessionData.scaleFactor;
+        const currentMeasuredValue = jatos.studySessionData.measuredValue;
+        
+        // Validation
+        let isValid = true;
+        if (!participantId) {
+            document.getElementById('participantError').style.display = 'block';
+            isValid = false;
+        }
+        if (!sessionId) {
+            document.getElementById('sessionError').style.display = 'block';
+            isValid = false;
+        }
+        
+        if (!isValid) return;
+
+        // Désactiver le bouton pendant le traitement
+        submitButton.disabled = true;
+        showStatus('Initialisation de la session...', 'success');
+
+        try {
+            // Mettre à jour les données de session en conservant les données de calibration
+            jatos.studySessionData = {
+                participantId: participantId,
+                sessionId: sessionId,
+                startTime: Date.now(),
+                scaleFactor: currentScaleFactor,
+                measuredValue: currentMeasuredValue
+            };
+
+            console.log("Données transmises au composant suivant:", jatos.studySessionData);
+
+            // Démarrer le composant suivant
+            jatos.startNextComponent();
+        } catch (error) {
+            console.error('Erreur:', error);
+            showStatus('Une erreur est survenue. Veuillez réessayer.', 'error');
+            submitButton.disabled = false;
+        }
+    });
+});
+
+    </script>
+</body>
+</html>

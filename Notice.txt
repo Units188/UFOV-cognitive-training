@@ -1,0 +1,74 @@
+# Documentation du format des données par tâche
+
+Format commun : chaque ligne commence par participant_id et session_id suivis des données spécifiques à la tâche.
+
+## Tâche 1 - Identification centrale
+Format : [1, 2, 3, 4, 5, 6, 7]
+1. participant_id : Identifiant du participant
+2. session_id : Numéro de la session
+3. trial_num : Numéro de l'essai
+4. presentation_time : Durée d'affichage des stimuli (ms)
+5. response_time : Temps de réponse (ms)
+6. success : Identification correcte (1/0)
+7. elapsed_time : Temps écoulé depuis le début de la tâche (ms)
+
+## Tâche 2 - Double identification
+Format : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+1. participant_id : Identifiant du participant
+2. session_id : Numéro de la session
+3. trial_num : Numéro de l'essai
+4. presentation_time : Durée d'affichage des stimuli (ms)
+5. central_rt : Temps de réponse identification centrale (ms)
+6. central_success : Réussite identification centrale (1/0)
+7. peripheral_rt : Temps de réponse identification périphérique (ms)
+8. peripheral_success : Réussite identification périphérique (1/0)
+9. target_distance : Distance entre le centre et la cible (pixels)
+10. elapsed_time : Temps écoulé depuis le début de la tâche (ms)
+
+## Tâche 3 - Double identification avec localisation
+Format : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+1. participant_id : Identifiant du participant
+2. session_id : Numéro de la session
+3. trial_num : Numéro de l'essai
+4. presentation_time : Durée d'affichage des stimuli (ms)
+5. central_rt : Temps de réponse identification centrale (ms)
+6. central_success : Réussite identification centrale (1/0)
+7. peripheral_rt : Temps de réponse identification périphérique (ms)
+8. peripheral_success : Réussite identification périphérique (1/0)
+9. location_rt : Temps de réponse localisation (ms)
+10. location_success : Réussite localisation (1/0)
+11. click_distance : Distance entre le clic et la cible (pixels)
+12. target_distance : Distance entre le centre et la cible (pixels)
+13. elapsed_time : Temps écoulé depuis le début de la tâche (ms)
+
+## Tâche 4 - Triple tâche
+Format : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+1. participant_id : Identifiant du participant
+2. session_id : Numéro de la session
+3. trial_num : Numéro de l'essai
+4. presentation_time : Durée d'affichage des stimuli (ms)
+5. central_rt : Temps de réponse identification centrale (ms)
+6. central_success : Réussite identification centrale (1/0)
+7. peripheral_rt : Temps de réponse identification périphérique (ms)
+8. peripheral_success : Réussite identification périphérique (1/0)
+9. location_rt : Temps de réponse localisation (ms)
+10. location_success : Réussite localisation (1/0)
+11. click_distance : Distance entre le clic et la cible (pixels)
+12. target_distance : Distance entre le centre et la cible (pixels)
+13. sound_rt : Temps de réponse identification du son (ms)
+14. sound_success : Réussite identification du son (1/0)
+15. elapsed_time : Temps écoulé depuis le début de la tâche (ms)
+
+## Exemple de données (Tâche 4)
+```
+5,1,1,1250,3497,0,381,1,482,0,150,240,782,0,124350
+5,1,2,1250,2648,1,407,1,1077,0,58,272,2401,1,183675
+5,1,3,1250,2616,1,321,1,533,0,84,363,1357,1,243128
+```
+
+## Notes importantes
+- Tous les temps sont en millisecondes (ms)
+- Les distances sont en pixels
+- Les réussites sont codées en binaire (1 = succès, 0 = échec)
+- La réussite de la localisation est considérée comme correcte si la distance de clic est < 80 pixels
+- Le champ elapsed_time mesure le temps écoulé depuis le début de la tâche en millisecondes
